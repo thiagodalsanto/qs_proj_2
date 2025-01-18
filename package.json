@@ -1,0 +1,24 @@
+{
+  "name": "pw-lab07",
+  "description": "Lab 07 da UC PW",
+  "version": "1.0.0",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.2",
+    "express-session": "^1.17.2",
+    "mysql2": "^2.3.3",
+    "mysql2-promise": "^0.1.4",
+    "nodemon": "^3.1.9",
+    "oracledb": "^5.3.0",
+    "websocket": "^1.0.34",
+    "ws": "^8.5.0"
+  },
+  "license": "MIT",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": ""
+}
