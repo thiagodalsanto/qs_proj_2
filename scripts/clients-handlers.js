@@ -29,7 +29,7 @@ module.exports.editClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "UPDATE client SET name = ?, address = ?, postCode = ?, email = ?, nif = ? WHERE ID = ?";
-    connection.query(query, [request.body.name, request.body.address, request.body.postCode, request.body.email, request.body.nif, request.body.id], function (err, rows) {
+    connection.query(query, [request.body.name, request.body.address, request.body.postCode, request.body.email, request.body.nif, request.body.id], function (err) {
         if (err) {
             console.log(err)
             response.json({success: false});
@@ -45,7 +45,7 @@ module.exports.deleteClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "DELETE FROM client WHERE id = ?";
-    connection.query(query, [request.params.id], function (err, rows) {
+    connection.query(query, [request.params.id], function (err) {
         if (err) {
             console.log(err);
             response.sendStatus(500);
@@ -61,7 +61,7 @@ module.exports.createClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "INSERT INTO client (NAME, ADDRESS, POSTCODE, EMAIL, NIF) VALUES (?, ?, ?, ?, ?)";
-    connection.query(query, [request.body.name, request.body.address, request.body.postCode, request.body.email, request.body.nif], function (err, rows) {
+    connection.query(query, [request.body.name, request.body.address, request.body.postCode, request.body.email, request.body.nif], function (err) {
         if (err) {
             console.log(err);
             response.sendStatus(500);

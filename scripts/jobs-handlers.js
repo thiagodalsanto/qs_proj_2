@@ -127,7 +127,7 @@ module.exports.editJobInfo = (request, response) => {
                 notes, status, equipmentBrand, priority, priorityWork, dateFinalised, userId, id];
         }
 
-        connection.query(query, parameters, function (err, rows) {
+        connection.query(query, parameters, function (err) {
             if (err) {
                 console.log(err)
                 response.sendStatus(500);
@@ -172,7 +172,7 @@ module.exports.createJob = (request, response) => {
             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        connection.query(query, [userId, userIdClient, equipmentType, equipmentTypeOther, equipmentBrand, equipmentProcedure, equipmentProcedureOther, dateStarted, status, notes, priority, priorityWork], function (err, rows) {
+        connection.query(query, [userId, userIdClient, equipmentType, equipmentTypeOther, equipmentBrand, equipmentProcedure, equipmentProcedureOther, dateStarted, status, notes, priority, priorityWork], function (err) {
             if (err) {
                 console.log(err);
                 response.sendStatus(500);
@@ -189,7 +189,7 @@ module.exports.reopenJob = (request, response) => {
     connection.connect();
     let query = `UPDATE JOB SET STATUS = ?, DATEFINISHED = ?, USERIDFINALISED = ? WHERE ID = ?`;
 
-    connection.query(query, ["1", null, null, JobId], function (err, rows) {
+    connection.query(query, ["1", null, null, JobId], function (err) {
         if (err) {
             console.log(err)
             response.sendStatus(500);
@@ -210,7 +210,7 @@ module.exports.editOrderPriority = (request, response) => {
 
     //console.log(startRowInfo, endRowInfo);
 
-    connection.query(`${query1}; ${query2}`, [startRowInfo.priorityWork, endRowInfo.id, endRowInfo.priorityWork, startRowInfo.id], function (err, results) {
+    connection.query(`${query1}; ${query2}`, [startRowInfo.priorityWork, endRowInfo.id, endRowInfo.priorityWork, startRowInfo.id], function (err) {
         if (err) {
             console.log(err)
             response.sendStatus(500);

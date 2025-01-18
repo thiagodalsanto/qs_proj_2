@@ -29,7 +29,7 @@ module.exports.createUser = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "INSERT INTO user (userName, name, email, password, role) VALUES (?, ?, ?, ?, ?)";
-    connection.query(query, [request.body.name, request.body.userName, request.body.email, request.body.password, request.body.role], function (err, rows) {
+    connection.query(query, [request.body.name, request.body.userName, request.body.email, request.body.password, request.body.role], function (err) {
         if (err) {
             console.log(err);
             response.sendStatus(500);
@@ -45,7 +45,7 @@ module.exports.editUser = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "UPDATE user SET name = ?, email = ?, role = ? WHERE ID = ?";
-    connection.query(query, [request.body.name, request.body.email, request.body.role, request.body.id], function (err, rows) {
+    connection.query(query, [request.body.name, request.body.email, request.body.role, request.body.id], function (err) {
         if (err) {
             console.log(err)
             response.json({success: false});
@@ -61,7 +61,7 @@ module.exports.deleteUser = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "DELETE FROM user WHERE id = ?";
-    connection.query(query, [request.params.id], function (err, rows) {
+    connection.query(query, [request.params.id], function (err) {
         if (err) {
             console.log(err);
             response.sendStatus(500);

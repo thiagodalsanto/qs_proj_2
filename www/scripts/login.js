@@ -1,8 +1,9 @@
+const { resetLocalStorage, getBrowser, SaveUserDetails } = require('./helper.js');
 
-$(document).ready(()=>{
+(document).ready(()=>{
     resetLocalStorage();
 
-    $("form").on("submit", function(event){
+    ("form").on("submit", function(event){
         event.stopPropagation();
         event.preventDefault();
         submitLogin();
@@ -32,8 +33,8 @@ $(document).ready(()=>{
 function submitLogin() {
     showHideModalErrorMessage(false);
 
-    let login = $("#login").val();
-    let password = $("#password").val();
+    let login = ("#login").val();
+    let password = ("#password").val();
 
     if (login === "") {
         showHideModalErrorMessage(true, "Username ou email obrigatório.");
@@ -76,7 +77,7 @@ function loginAjax(login, password, callback){
 
 //============================================= HELPER FUNCTIONS
 function showHideModalErrorMessage(show, message) { 
-    let errorMessage = $("#formFooter");
+    let errorMessage = ("#formFooter");
 
     if (show) {
         errorMessage.text(message);
