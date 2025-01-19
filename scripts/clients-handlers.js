@@ -1,16 +1,22 @@
 "use strict";
-const mysql = require("mysql2");
-const options = require("./connection-options.json");
+import mysql from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.getClients = (request, response) => {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
+
+export const getClients = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = `
         SELECT C.id, C.name, C.address, C.postCode, C.email, C.nif, 
         SUM((CASE WHEN J.ID IS NOT NULL THEN 1 ELSE 0 END)) AS TOTAL_JOBS,
         SUM((CASE WHEN J.ID IS NOT NULL AND J.STATUS = '4' THEN 1 ELSE 0 END)) AS TOTAL_JOBS_FINALISED
-        FROM client C 
-        LEFT JOIN job J ON J.userIdClient = C.ID
+        FROM CLIENT C 
+        LEFT JOIN JOB J ON J.USERIDCLIENT = C.ID
         GROUP BY C.id, C.name, C.address, C.postCode, C.email, C.nif
         ORDER BY C.ID ASC
     `;
@@ -25,7 +31,7 @@ module.exports.getClients = (request, response) => {
     });
 }
 
-module.exports.editClient = (request, response) => {
+export const editClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "UPDATE client SET name = ?, address = ?, postCode = ?, email = ?, nif = ? WHERE ID = ?";
@@ -41,7 +47,7 @@ module.exports.editClient = (request, response) => {
     });
 }
 
-module.exports.deleteClient = (request, response) => {
+export const deleteClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "DELETE FROM client WHERE id = ?";
@@ -57,10 +63,10 @@ module.exports.deleteClient = (request, response) => {
     });
 }
 
-module.exports.createClient = (request, response) => {
+export const createClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
-    let query = "INSERT INTO client (NAME, ADDRESS, POSTCODE, EMAIL, NIF) VALUES (?, ?, ?, ?, ?)";
+    let query = "INSERT INTO CLIENT (NAME, ADDRESS, POSTCODE, EMAIL, NIF) VALUES (?, ?, ?, ?, ?)";
     connection.query(query, [request.body.name, request.body.address, request.body.postCode, request.body.email, request.body.nif], function (err) {
         if (err) {
             console.log(err);

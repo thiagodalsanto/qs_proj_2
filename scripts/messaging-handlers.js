@@ -1,14 +1,20 @@
 "use strict";
-const mysql = require("mysql2");
-const options = require("./connection-options.json");
+import { createConnection } from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.loadWebSocketSettings = (request, response) => {
-    let connection = mysql.createConnection(options);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
+
+export const loadWebSocketSettings = (request, response) => {
+    let connection = createConnection(options);
     connection.connect();
 
     //console.log(request.body)
     
-    let query1 = `SELECT ID, USERNAME, NAME, EMAIL, ROLE FROM user WHERE ID != ?`;
+    let query1 = `SELECT ID, USERNAME, NAME, EMAIL, ROLE FROM USER WHERE ID != ?`;
     let query2 = `
         SELECT 
         M.MESSAGE_SENT_BY,
@@ -16,7 +22,7 @@ module.exports.loadWebSocketSettings = (request, response) => {
         M.MESSAGE_FROM AS MESSAGE_FROM_ID, USER_FROM.USERNAME AS USERNAME_FROM,
         M.MESSAGE, UPPER(DATE_FORMAT(M.DATE_CREATED, '%d-%b-%Y %H:%i:%s')) AS DATE_CREATED, M.SEEN,
         M.MESSAGE_ID   
-        FROM messages M
+        FROM MESSAGES M
         INNER JOIN USER USER_FROM ON USER_FROM.ID = M.MESSAGE_FROM
         INNER JOIN USER USER_TO ON USER_TO.ID = M.MESSAGE_TO
         WHERE (M.MESSAGE_FROM = ? OR M.MESSAGE_TO = ?)
@@ -34,8 +40,8 @@ module.exports.loadWebSocketSettings = (request, response) => {
     });
 }
 
-module.exports.messagingInsertNew = (message, callback) => {
-    let connection = mysql.createConnection(options);
+export const messagingInsertNew = (message, callback) => {
+    let connection = createConnection(options);
     connection.connect();
 
     let query = `INSERT INTO MESSAGES (message_sent_by, message_from, message_to, message, date_created, seen) VALUES(?, ?, ?, ?, ?, ?)`;
@@ -52,9 +58,9 @@ module.exports.messagingInsertNew = (message, callback) => {
     });
 }
 
-module.exports.loadWebSocketMessages = (request, response) => {
+export const loadWebSocketMessages = (request, response) => {
     //console.log(request.body);
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     let query = `
         SELECT 
@@ -63,7 +69,7 @@ module.exports.loadWebSocketMessages = (request, response) => {
         M.MESSAGE_FROM AS MESSAGE_FROM_ID, USER_FROM.USERNAME AS USERNAME_FROM,
         M.MESSAGE, UPPER(DATE_FORMAT(M.DATE_CREATED, '%d-%b-%Y %H:%i:%s')) AS DATE_CREATED, M.SEEN,
         M.MESSAGE_ID   
-        FROM messages M
+        FROM MESSAGES M
         INNER JOIN USER USER_FROM ON USER_FROM.ID = M.MESSAGE_FROM
         INNER JOIN USER USER_TO ON USER_TO.ID = M.MESSAGE_TO
         WHERE (M.MESSAGE_FROM = ? OR M.MESSAGE_TO = ?)

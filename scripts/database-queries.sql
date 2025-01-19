@@ -62,7 +62,7 @@ insert into `user`(userName, name, email, password, role)
 values('nunesd', 'Daniel Nunes', 'daniel@gmail.com','123456', 'A');
 
 
-#=============================================================================== codes QUERYS
+#=============================================================================== CODES QUERYS
 DROP TABLE IF EXISTS codes;
 CREATE TABLE codes (
   domain varchar(30) NOT NULL,

@@ -1,10 +1,16 @@
 "use strict";
-const mysql = require("mysql2");
-const options = require("./connection-options.json");
+import { createConnection } from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.getListJobs = (request, response) => {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
+
+export const getListJobs = (request, response) => {
     const {type, identifier} = request.body;
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     let query = `
         SELECT J.ID AS JOB_ID, J.USERID AS USER_ID_CREATED, USER_CREATION.NAME AS USER_NAME_CREATED, 
@@ -20,15 +26,15 @@ module.exports.getListJobs = (request, response) => {
         COALESCE(NOTES, '-') AS NOTES, 
         PRIORITY_CODE.CODE AS PRIORITY_CODE, PRIORITY_CODE.DESCRIPTION AS PRIORITY_DESCRIPTION, COALESCE(J.Priority_Work, 1) AS PRIORITY_WORK,
         CLI.NAME AS CLIENT_NAME, CLI.EMAIL AS CLIENT_EMAIL, CLI.NIF AS CLIENT_NIF
-        FROM job J
-        LEFT JOIN user USER_FINALISED ON USER_FINALISED.ID = J.USERIDFINALISED
-        INNER JOIN user USER_CREATION ON USER_CREATION.ID = J.USERID
-        INNER JOIN codes EQUIPMENT_BRAND_CODE ON EQUIPMENT_BRAND_CODE.DOMAIN = 'JOB_BRAND' AND EQUIPMENT_BRAND_CODE.CODE = J.EQUIPMENT_BRAND
-        INNER JOIN codes STATUS_CODE ON STATUS_CODE.DOMAIN = 'JOB_STATUS' AND STATUS_CODE.CODE = J.STATUS
-        INNER JOIN codes PRIORITY_CODE ON PRIORITY_CODE.DOMAIN = 'JOB_PRIORITY' AND PRIORITY_CODE.CODE = J.PRIORITY
-        INNER JOIN codes EQUIPMENT_TYPE ON EQUIPMENT_TYPE.DOMAIN = 'JOB_EQUIPEMENT' AND EQUIPMENT_TYPE.CODE = J.EQUIPMENT_TYPE
-        INNER JOIN codes EQUIPMENT_PROCEDURE ON EQUIPMENT_PROCEDURE.DOMAIN = 'JOB_EQUIPEMENT_PROCEDURE' AND EQUIPMENT_PROCEDURE.CODE = J.EQUIPMENT_PROCEDURE
-        INNER JOIN client CLI ON CLI.ID = J.USERIDCLIENT`;
+        FROM JOB J
+        LEFT JOIN USER USER_FINALISED ON USER_FINALISED.ID = J.USERIDFINALISED
+        INNER JOIN USER USER_CREATION ON USER_CREATION.ID = J.USERID
+        INNER JOIN CODES EQUIPMENT_BRAND_CODE ON EQUIPMENT_BRAND_CODE.DOMAIN = 'JOB_BRAND' AND EQUIPMENT_BRAND_CODE.CODE = J.EQUIPMENT_BRAND
+        INNER JOIN CODES STATUS_CODE ON STATUS_CODE.DOMAIN = 'JOB_STATUS' AND STATUS_CODE.CODE = J.STATUS
+        INNER JOIN CODES PRIORITY_CODE ON PRIORITY_CODE.DOMAIN = 'JOB_PRIORITY' AND PRIORITY_CODE.CODE = J.PRIORITY
+        INNER JOIN CODES EQUIPMENT_TYPE ON EQUIPMENT_TYPE.DOMAIN = 'JOB_EQUIPEMENT' AND EQUIPMENT_TYPE.CODE = J.EQUIPMENT_TYPE
+        INNER JOIN CODES EQUIPMENT_PROCEDURE ON EQUIPMENT_PROCEDURE.DOMAIN = 'JOB_EQUIPEMENT_PROCEDURE' AND EQUIPMENT_PROCEDURE.CODE = J.EQUIPMENT_PROCEDURE
+        INNER JOIN CLIENT CLI ON CLI.ID = J.USERIDCLIENT`;
 
     let vaiablesToBind = [];
 
@@ -58,15 +64,15 @@ module.exports.getListJobs = (request, response) => {
     });
 }
 
-module.exports.getUserInfoInitState = (request, response) => {
-    let connection = mysql.createConnection(options);
+export const getUserInfoInitState = (request, response) => {
+    let connection = createConnection(options);
     connection.connect();
-    let query1 = `SELECT * FROM codes WHERE DOMAIN = 'JOB_STATUS' ORDER BY DISPLAY_ORDER ASC`;
-    let query2 = `SELECT * FROM codes WHERE DOMAIN = 'JOB_EQUIPEMENT' ORDER BY DISPLAY_ORDER ASC`;
-    let query3 = `SELECT * FROM codes WHERE DOMAIN = 'JOB_EQUIPEMENT_PROCEDURE' ORDER BY DISPLAY_ORDER ASC`;
-    let query4 = `SELECT * FROM codes WHERE DOMAIN = 'JOB_BRAND' ORDER BY DISPLAY_ORDER ASC`;
-    let query5 = `SELECT ID, NAME FROM client`;
-    let query6 = `SELECT * FROM codes WHERE DOMAIN = 'JOB_PRIORITY' ORDER BY DISPLAY_ORDER ASC`;
+    let query1 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_STATUS' ORDER BY DISPLAY_ORDER ASC`;
+    let query2 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_EQUIPEMENT' ORDER BY DISPLAY_ORDER ASC`;
+    let query3 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_EQUIPEMENT_PROCEDURE' ORDER BY DISPLAY_ORDER ASC`;
+    let query4 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_BRAND' ORDER BY DISPLAY_ORDER ASC`;
+    let query5 = `SELECT ID, NAME FROM CLIENT`;
+    let query6 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_PRIORITY' ORDER BY DISPLAY_ORDER ASC`;
 
     connection.query(`${query1}; ${query2}; ${query3}; ${query4}; ${query5}; ${query6}`, function (err, results) {
         if (err) {
@@ -78,16 +84,16 @@ module.exports.getUserInfoInitState = (request, response) => {
     });
 }
 
-module.exports.editJobInfo = (request, response) => {
+export const editJobInfo = (request, response) => {
     const {id, userId, status, equipmentType, equipmentTypeOther, equipmentProcedure, equipmentProcedureOther, equipmentBrand, notes, priority} = request.body;   
 
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     
     let query = `SELECT
         MAX(Priority_Work) AS PRIORITY_NUMBER,
         COUNT(*) AS TOTAL_JOBS
-        FROM job WHERE PRIORITY = ?`;
+        FROM JOB WHERE PRIORITY = ?`;
     
     connection.query(query, [priority], function (err, result) {
         if (err) {
@@ -141,13 +147,13 @@ module.exports.editJobInfo = (request, response) => {
     });
 }
 
-module.exports.createJob = (request, response) => {
+export const createJob = (request, response) => {
     const {userId, userIdClient, status, equipmentType, equipmentTypeOther, equipmentProcedure, equipmentProcedureOther, equipmentBrand, notes, priority} = request.body;
         
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
 
-    let query = "SELECT MAX(Priority_Work) AS PRIORITY_NUMBER FROM job WHERE PRIORITY = ?";
+    let query = "SELECT MAX(Priority_Work) AS PRIORITY_NUMBER FROM JOB WHERE PRIORITY = ?";
     
     connection.query(query, [priority], function (err, result) {
         if (err) {
@@ -183,9 +189,9 @@ module.exports.createJob = (request, response) => {
     });
 }
 
-module.exports.reopenJob = (request, response) => {
+export const reopenJob = (request, response) => {
     const {JobId} = request.body;
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     let query = `UPDATE JOB SET STATUS = ?, DATEFINISHED = ?, USERIDFINALISED = ? WHERE ID = ?`;
 
@@ -199,10 +205,10 @@ module.exports.reopenJob = (request, response) => {
     });
 }
 
-module.exports.editOrderPriority = (request, response) => {
+export const editOrderPriority = (request, response) => {
     const { startRowInfo, endRowInfo } = request.body;
 
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
 
     let query1 = `UPDATE JOB SET Priority_Work = ? WHERE ID = ?`;

@@ -1,51 +1,55 @@
 "use strict";
-const { saveClientsLocalStorage, Client, getClientsLocalStorage } = require('./helper.js');
+
+import {
+    Client,
+    saveClientsLocalStorage,
+    getClientsLocalStorage
+} from "./helper.js";
 
 var clientsArray = [];
 var clientTable = null;
 
-
-(document).ready(()=> {
-    ("#buttonNewClientSave").on("click", function(event){
+$(document).ready(()=> {
+    $("#buttonNewClientSave").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         createNewClientModalVerification();
     });
 
-    ("#buttonNewClientOpenModel").on("click", function(event){
+    $("#buttonNewClientOpenModel").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         createNewClientModal();
     });
 
-    ("#buttonEditClientDelete").on("click", function(event){
+    $("#buttonEditClientDelete").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkClientModalToDelete();
     });
 
-    ("#buttonEditClientSave").on("click", function(event){
+    $("#buttonEditClientSave").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkClientModalToSave();
     });
 
-    ("#buttonDeleteClientCancel").on("click", function(event){
+    $("#buttonDeleteClientCancel").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkClientModalToDeleteButton(false);
     });
 
-    ("#buttonDeleteClientConfirm").on("click", function(event){
+    $("#buttonDeleteClientConfirm").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkClientModalToDeleteButton(true);
     });
 
-    (document).on("click", "#clientsTable tbody tr td:last-child i", function(e){
+    $(document).on("click", "#clientsTable tbody tr td:last-child i", function(e){
         e.preventDefault();
         e.stopPropagation();
-        const clientId = parseInt((this).attr("data-clientId"));
+        const clientId = parseInt($(this).attr("data-clientId"));
         openClientModalToEdit(clientId); 
     });
 
@@ -58,7 +62,7 @@ var clientTable = null;
 function openClientModalToEdit(clientId){    
     const client = clientsArray.filter((c)=>{ return c.id === clientId; })[0];
     //console.log(client);
-    let modal = ("#modalEditClients");
+    let modal = $("#modalEditClients");
     modal.attr("data-id", clientId);
 
     modal.find("#inpEditName").val("");
@@ -79,7 +83,7 @@ function openClientModalToEdit(clientId){
 }
 
 function checkClientModalToSave() {
-    let modal = ("#modalEditClients");    
+    let modal = $("#modalEditClients");    
     const clientId = parseInt(modal.attr("data-id"));
 
     showHideModalErrorMessage(modal, false);
@@ -129,12 +133,12 @@ function checkClientModalToSave() {
 }
 
 function checkClientModalToDelete(){
-    let modalEdit = ("#modalEditClients");    
+    let modalEdit = $("#modalEditClients");    
     const clientId = parseInt(modalEdit.attr("data-id"));
 
     modalEdit.on('hidden.bs.modal', function () {
-        (this).off('hidden.bs.modal');
-        let modalMessage = ("#modalMessage");
+        $(this).off('hidden.bs.modal');
+        let modalMessage = $("#modalMessage");
         modalMessage.find(".modal-body p").text("Tem a certeza que quer remover este cliente?");
         modalMessage.attr("data-id", clientId);
         modalMessage.modal("show");
@@ -143,15 +147,15 @@ function checkClientModalToDelete(){
 }
 
 function checkClientModalToDeleteButton(toDelete){
-    let modalMessage = ("#modalMessage");
-    let modalEdit = ("#modalEditClients"); 
+    let modalMessage = $("#modalMessage");
+    let modalEdit = $("#modalEditClients"); 
     const clientId = parseInt(modalMessage.attr("data-id"));
 
     showHideModalErrorMessage(modalEdit, false);
 
     if (!toDelete) {
         modalMessage.on('hidden.bs.modal', function () {
-            (this).off('hidden.bs.modal');
+            $(this).off('hidden.bs.modal');
             modalEdit.modal("show");
         });
         modalMessage.modal("hide");
@@ -161,7 +165,7 @@ function checkClientModalToDeleteButton(toDelete){
     deleteClientAjax(clientId, (success)=>{
         if (!success) {
             modalMessage.on('hidden.bs.modal', function () {
-                (this).off('hidden.bs.modal');
+                $(this).off('hidden.bs.modal');
                 showHideModalErrorMessage(modalEdit, true, "Algo correu mal. Tente outravez.");
                 modalEdit.modal("show");
             });
@@ -175,7 +179,7 @@ function checkClientModalToDeleteButton(toDelete){
 }
 
 function createNewClientModal(){
-    let modal = ("#modalCreateClients");
+    let modal = $("#modalCreateClients");
     modal.find("#inpCreateName").val("");
     modal.find("#inpCreateEmail").val("");
     modal.find("#inpCreateAddress").val("");
@@ -186,7 +190,7 @@ function createNewClientModal(){
 }
 
 function createNewClientModalVerification(){
-    let modal = ("#modalCreateClients");
+    let modal = $("#modalCreateClients");
 
     const client = new Client(
         null, 
@@ -251,7 +255,7 @@ function showHideModalErrorMessage(modal, show, message) {
 }
 
 function loadAllClients() {
-    let table = ("#clientsTable"); 
+    let table = $("#clientsTable"); 
 
     getClientsAjax((clients)=>{
         clientsArray = clients;
@@ -286,7 +290,7 @@ function loadAllClients() {
                 { orderable: false, targets: [2, 3, 4] }
             ],
             fnRowCallback: function(row) {
-                (row).attr("scope", "row");     
+                $(row).attr("scope", "row");     
             },
             columns: [
                 { data: 'name' },
@@ -310,7 +314,7 @@ function loadAllClients() {
                 },
                 { data: null, render : function (data, type) {
                     if (type === "display") {
-                        return `<i class="fas fa-edit table-client-icon-edit" data-clientId="{data.id}"></i>`;
+                        return `<i class="fas fa-edit table-client-icon-edit" data-clientId="${data.id}"></i>`;
                     } 
                     else 
                     {
@@ -367,7 +371,7 @@ function editClientAjax(client, callback){
 function deleteClientAjax(id, callback){
     let xhr = new XMLHttpRequest();
     xhr.responseType="json";    
-    xhr.open("DELETE", `/api/deleteClient/{id}`, true);
+    xhr.open("DELETE", `/api/deleteClient/${id}`, true);
     xhr.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             callback(true);

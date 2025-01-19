@@ -1,48 +1,55 @@
 "use strict";
-const { JobInfo, JobTyperequest, saveUserJobsLocalStorage, getUserJobsLocalStorage, userDetails } = require('./helper.js');
+
+import {
+    JobInfo,
+    userDetails,
+    JobTyperequest,
+    saveUserJobsLocalStorage,
+    getUserJobsLocalStorage
+} from "./helper.js";
 
 var jobsArray = [];
 var tableJobs;
 var initPageState;
 
-(document).ready(()=> {
-    ("#btnNewService").on("click", function(event) {
+$(document).ready(()=> {
+    $("#btnNewService").on("click", function(event) {
         event.stopPropagation();
         event.preventDefault();
         openNewServiceModal();
     });
 
-    (".newServiceContainerOuterBodyFooter .btnClose").on("click", function(event) {
+    $(".newServiceContainerOuterBodyFooter .btnClose").on("click", function(event) {
         event.stopPropagation();
         event.preventDefault();
-        ("#newServiceContainer").hide();
+        $("#newServiceContainer").hide();
     });
 
-    (".newServiceContainerOuterBodyFooter .btnSave").on("click", function(event) {
+    $(".newServiceContainerOuterBodyFooter .btnSave").on("click", function(event) {
         event.stopPropagation();
         event.preventDefault();
         saveJobInformation();
     });
     
-    (".newCreateServiceContainerOuterBodyFooter .btnClose").on("click", function(event) {
+    $(".newCreateServiceContainerOuterBodyFooter .btnClose").on("click", function(event) {
         event.stopPropagation();
         event.preventDefault();
-        ("#newCreateServiceContainer").hide();
+        $("#newCreateServiceContainer").hide();
     });
 
-    (".newCreateServiceContainerOuterBodyFooter .btnSave").on("click", function(event) {
+    $(".newCreateServiceContainerOuterBodyFooter .btnSave").on("click", function(event) {
         event.stopPropagation();
         event.preventDefault();
         createJobInformation();
     });
 
-    ("#inputEquipmentType").on("change", function(event) {
+    $("#inputEquipmentType").on("change", function(event) {
         event.stopPropagation();
         event.preventDefault();
 
-        let option = (this).val();
+        let option = $(this).val();
 
-        let dropEquipmentTypeTextarea = ("#textareaEquipmentType");
+        let dropEquipmentTypeTextarea = $("#textareaEquipmentType");
         let dropEquipmentTypeTextareaContent = dropEquipmentTypeTextarea.parent();
 
         dropEquipmentTypeTextarea.val("");
@@ -55,13 +62,13 @@ var initPageState;
         dropEquipmentTypeTextareaContent.addClass("textareaEquipmentTypeDescription");
     });
 
-    ("#inputEquipmentType1").on("change", function(event) {
+    $("#inputEquipmentType1").on("change", function(event) {
         event.stopPropagation();
         event.preventDefault();
 
-        let option = (this).val();
+        let option = $(this).val();
 
-        let dropEquipmentTypeTextarea = ("#textareaEquipmentType1");
+        let dropEquipmentTypeTextarea = $("#textareaEquipmentType1");
         let dropEquipmentTypeTextareaContent = dropEquipmentTypeTextarea.parent();
 
         dropEquipmentTypeTextarea.val("");
@@ -74,13 +81,13 @@ var initPageState;
         dropEquipmentTypeTextareaContent.addClass("textareaEquipmentTypeDescription1");
     });
 
-    ("#inputEquipmentProcedure").on("change", function(event) {
+    $("#inputEquipmentProcedure").on("change", function(event) {
         event.stopPropagation();
         event.preventDefault();
 
-        let option = (this).val();
+        let option = $(this).val();
 
-        let dropEquipmentProcedureTextarea = ("#textareaEquipmentProcedure");
+        let dropEquipmentProcedureTextarea = $("#textareaEquipmentProcedure");
         let dropEquipmentProcedureTextareaContent = dropEquipmentProcedureTextarea.parent();
 
         dropEquipmentProcedureTextarea.val("");
@@ -93,13 +100,13 @@ var initPageState;
         dropEquipmentProcedureTextareaContent.addClass("textareaEquipmentProcedureDescription");
     });
 
-    ("#inputEquipmentProcedure1").on("change", function(event) {
+    $("#inputEquipmentProcedure1").on("change", function(event) {
         event.stopPropagation();
         event.preventDefault();
 
-        let option = (this).val();
+        let option = $(this).val();
 
-        let dropEquipmentProcedureTextarea = ("#textareaEquipmentProcedure1");
+        let dropEquipmentProcedureTextarea = $("#textareaEquipmentProcedure1");
         let dropEquipmentProcedureTextareaContent = dropEquipmentProcedureTextarea.parent();
 
         dropEquipmentProcedureTextarea.val("");
@@ -112,48 +119,48 @@ var initPageState;
         dropEquipmentProcedureTextareaContent.addClass("textareaEquipmentProcedureDescription1");
     });
 
-    ("#dropDownTypeJobList").on("change", function(event) {
+    $("#dropDownTypeJobList").on("change", function(event) {
         event.stopPropagation();
         event.preventDefault();
         loadListJobs();
     });
 
-    (".newServiceContainerOuterBodyFooter .btnReopen").on("click", function(event) {
+    $(".newServiceContainerOuterBodyFooter .btnReopen").on("click", function(event) {
         event.stopPropagation();
         event.preventDefault();
-        reopenJobAjax((this).attr("data-id"), (success)=>{
+        reopenJobAjax($(this).attr("data-id"), (success)=>{
             if (!success) {
                 alert("Algo correu mal. tente outravez.");
                 return;
             }
-            ("#inputEquipmentType").removeAttr("disabled");
-            ("#inputEquipmentBrand").removeAttr("disabled");
-            ("#textareaEquipmentType").removeAttr("disabled");
-            ("#inputEquipmentProcedure").removeAttr("disabled");
-            ("#textareaEquipmentProcedure").removeAttr("disabled");
-            ("#textareaJobNotes").removeAttr("disabled");
+            $("#inputEquipmentType").removeAttr("disabled");
+            $("#inputEquipmentBrand").removeAttr("disabled");
+            $("#textareaEquipmentType").removeAttr("disabled");
+            $("#inputEquipmentProcedure").removeAttr("disabled");
+            $("#textareaEquipmentProcedure").removeAttr("disabled");
+            $("#textareaJobNotes").removeAttr("disabled");
         
-            let editJobStatus = ("#inputJobStatus");
+            let editJobStatus = $("#inputJobStatus");
             editJobStatus.removeAttr("disabled");
             editJobStatus.find(`option[value='1']`).prop("selected", true);
 
-            let divInfoFinalised = (".editJobFinalisedDiv");
+            let divInfoFinalised = $(".editJobFinalisedDiv");
             divInfoFinalised.find(".alert").html("");
             divInfoFinalised.hide();
 
-            (".newServiceContainerOuterBodyFooter .btnReopen").hide();
+            $(".newServiceContainerOuterBodyFooter .btnReopen").hide();
 
             loadListJobs();
      
         });
     });
     
-    (document).on("dragstart", ".jobEditCardDetailsPriority .card-body-body .badge", function(event) {  
+    $(document).on("dragstart", ".jobEditCardDetailsPriority .card-body-body .badge", function(event) {  
         event.originalEvent.dataTransfer.effectAllowed = "move";
-        event.originalEvent.dataTransfer.setData("code", (event.target).attr("data-code"));
+        event.originalEvent.dataTransfer.setData("code", $(event.target).attr("data-code"));
     });
 
-    (document).on("dragover", ".jobEditCardDetailsPriority .card-body-header", function(event) {  
+    $(document).on("dragover", ".jobEditCardDetailsPriority .card-body-header", function(event) {  
         event.stopPropagation();
         event.preventDefault();
     })
@@ -166,12 +173,12 @@ var initPageState;
         setPriorityCard(code, "jobEditCardDetailsPriority");
     });
 
-    (document).on("dragstart", ".jobCreateCardDetailsPriority .card-body-body .badge", function(event) {  
+    $(document).on("dragstart", ".jobCreateCardDetailsPriority .card-body-body .badge", function(event) {  
         event.originalEvent.dataTransfer.effectAllowed = "move";
-        event.originalEvent.dataTransfer.setData("code", (event.target).attr("data-code"));
+        event.originalEvent.dataTransfer.setData("code", $(event.target).attr("data-code"));
     });
 
-    (document).on("dragover", ".jobCreateCardDetailsPriority .card-body-header", function(event) {  
+    $(document).on("dragover", ".jobCreateCardDetailsPriority .card-body-header", function(event) {  
         event.stopPropagation();
         event.preventDefault();
     })
@@ -185,12 +192,12 @@ var initPageState;
     });
 
 
-    (document).on("dragstart", "#jobsTable tbody tr", function(event) {  
+    $(document).on("dragstart", "#jobsTable tbody tr", function(event) {  
         event.originalEvent.dataTransfer.effectAllowed = "move";
-        event.originalEvent.dataTransfer.setData("rowInfo", (event.target).attr("data-rowinfo"));
+        event.originalEvent.dataTransfer.setData("rowInfo", $(event.target).attr("data-rowinfo"));
     });
     
-    (document).on("dragover", "#jobsTable tbody tr", function(event) {  
+    $(document).on("dragover", "#jobsTable tbody tr", function(event) {  
         event.stopPropagation();
         event.preventDefault();
     })
@@ -200,7 +207,7 @@ var initPageState;
     })
     .on("drop", "#jobsTable tbody tr", function(event) { 
         const startRowInfo = JSON.parse(event.originalEvent.dataTransfer.getData("rowInfo"));
-        let endRowInfo = (event.target);
+        let endRowInfo = $(event.target);
         if (endRowInfo[0].tagName === "TD") {
             endRowInfo = endRowInfo.parent();
         }
@@ -231,10 +238,10 @@ var initPageState;
         loadListJobs();
     });
 
-    (document).on("click", "#jobsTable tbody tr td:last-child i", function(e){
+    $(document).on("click", "#jobsTable tbody tr td:last-child i", function(e){
         e.preventDefault();
         e.stopPropagation();
-        const jobId = parseInt((this).attr("data-jobid"));
+        const jobId = parseInt($(this).attr("data-jobid"));
         editJobOpenModal(jobId); 
     });
 
@@ -246,35 +253,35 @@ function buildInitialPageState(){
     }
 
     //console.log(initPageState);
-    let dropEquipmentType = ("#inputEquipmentType");
-    let dropEquipmentType2 = ("#inputEquipmentType1");
+    let dropEquipmentType = $("#inputEquipmentType");
+    let dropEquipmentType2 = $("#inputEquipmentType1");
     initPageState[1].forEach((jobEquipment)=>{
         dropEquipmentType.append(`<option value='${jobEquipment.code}'>${jobEquipment.description}</option>`);
         dropEquipmentType2.append(`<option value='${jobEquipment.code}'>${jobEquipment.description}</option>`);
     });
 
-    let dropEquipmentBrand = ("#inputEquipmentBrand");
-    let dropEquipmentBrand2= ("#inputEquipmentBrand1");
+    let dropEquipmentBrand = $("#inputEquipmentBrand");
+    let dropEquipmentBrand2= $("#inputEquipmentBrand1");
     initPageState[3].forEach((brand)=>{
         dropEquipmentBrand.append(`<option value='${brand.code}'>${brand.description}</option>`);
         dropEquipmentBrand2.append(`<option value='${brand.code}'>${brand.description}</option>`);
     });
 
-    let dropEquipmentProcedure = ("#inputEquipmentProcedure");
-    let dropEquipmentProcedure2 = ("#inputEquipmentProcedure1");
+    let dropEquipmentProcedure = $("#inputEquipmentProcedure");
+    let dropEquipmentProcedure2 = $("#inputEquipmentProcedure1");
     initPageState[2].forEach((jobEquipment)=>{
         dropEquipmentProcedure.append(`<option value='${jobEquipment.code}'>${jobEquipment.description}</option>`);
         dropEquipmentProcedure2.append(`<option value='${jobEquipment.code}'>${jobEquipment.description}</option>`);
     });
 
-    let editJobStatus = ("#inputJobStatus");
-    let editJobStatus2 = ("#inputJobStatus1");
+    let editJobStatus = $("#inputJobStatus");
+    let editJobStatus2 = $("#inputJobStatus1");
     initPageState[0].forEach((status)=>{
         editJobStatus.append(`<option value='${status.code}'>${status.description}</option>`);
         editJobStatus2.append(`<option value='${status.code}'>${status.description}</option>`);
     });
 
-    let dropDownTypeJobList = ("#dropDownTypeJobList");
+    let dropDownTypeJobList = $("#dropDownTypeJobList");
     let tempList = [
         { code: "ME", description: "Mostrar os meus trabalhos"},
         { code: "ALL", description: "Mostrar todos os trabalhos"}
@@ -287,7 +294,7 @@ function buildInitialPageState(){
         dropDownTypeJobList.append(`<option value='${status.code}'>${status.description}</option>`);
     });
 
-    let dropCreateClient = ("#dropCreateClient");
+    let dropCreateClient = $("#dropCreateClient");
     [{ID: 0, NAME: "Selecionar cliente"}].forEach((client)=>{
         dropCreateClient.append(`<option value='${client.ID}'>${client.NAME}</option>`);
     });
@@ -305,7 +312,7 @@ function loadListJobs() {
 }
 
 function createTable(jobs) {
-    let table = ("#jobsTable");
+    let table = $("#jobsTable");
 
     if (tableJobs) {
         tableJobs.clear().draw();
@@ -339,7 +346,7 @@ function createTable(jobs) {
                 priorityWork: rowData.PRIORITY_WORK
             };
 
-            (row).attr("scope", "row").attr("draggable", "true").attr("data-rowinfo", JSON.stringify(rowInfo));     
+            $(row).attr("scope", "row").attr("draggable", "true").attr("data-rowinfo", JSON.stringify(rowInfo));     
         },
         columnDefs: [
             { targets: 0, className: "text-center", width: "25px" },
@@ -450,30 +457,30 @@ function createTable(jobs) {
 }
 
 function openNewServiceModal(){
-    let container = ("#newCreateServiceContainer");
+    let container = $("#newCreateServiceContainer");
 
-    let dropEquipmentType = ("#inputEquipmentType1");
+    let dropEquipmentType = $("#inputEquipmentType1");
     dropEquipmentType.find(`option[value='1']`).prop("selected", true);
 
-    let textareaEquipmentType1 = ("#textareaEquipmentType1");
+    let textareaEquipmentType1 = $("#textareaEquipmentType1");
     textareaEquipmentType1.val("");
     textareaEquipmentType1.parent().addClass("textareaEquipmentTypeDescription1");
 
-    let dropEquipmentBrand= ("#inputEquipmentBrand1");
+    let dropEquipmentBrand= $("#inputEquipmentBrand1");
     dropEquipmentBrand.find(`option[value='1']`).prop("selected", true);
 
-    let dropEquipmentProcedure = ("#inputEquipmentProcedure1");
+    let dropEquipmentProcedure = $("#inputEquipmentProcedure1");
     dropEquipmentProcedure.find(`option[value='1']`).prop("selected", true);
 
-    let textareaEquipmentProcedure1 = ("#textareaEquipmentProcedure1");
+    let textareaEquipmentProcedure1 = $("#textareaEquipmentProcedure1");
     textareaEquipmentProcedure1.val("");
     textareaEquipmentProcedure1.parent().addClass("textareaEquipmentProcedureDescription1");
 
-    let editJobStatus = ("#inputJobStatus1");
+    let editJobStatus = $("#inputJobStatus1");
     editJobStatus.find(`option[value='1']`).prop("selected", true);
     editJobStatus.find(`option[value='4']`).hide();
 
-    let dropCreateClient = ("#dropCreateClient");
+    let dropCreateClient = $("#dropCreateClient");
     dropCreateClient.find(`option[value='0']`).prop("selected", true);
 
     setPriorityCard("4", "jobCreateCardDetailsPriority");
@@ -482,29 +489,29 @@ function openNewServiceModal(){
 }
 
 function saveJobInformation(){
-    let container = ("#newServiceContainer");
+    let container = $("#newServiceContainer");
     const jobId = parseInt( container.attr("data-jobId"));
    
     let job = new JobInfo(jobId);
     job.userId = userDetails.id;
 
-    job.equipmentType = ("#inputEquipmentType").val();
+    job.equipmentType = $("#inputEquipmentType").val();
     if (job.equipmentType === "100") {
-        job.equipmentTypeOther = ("#textareaEquipmentType").val();
+        job.equipmentTypeOther = $("#textareaEquipmentType").val();
     }
 
-    job.equipmentBrand = ("#inputEquipmentBrand").val();
+    job.equipmentBrand = $("#inputEquipmentBrand").val();
 
-    job.equipmentProcedure = ("#inputEquipmentProcedure").val();
+    job.equipmentProcedure = $("#inputEquipmentProcedure").val();
     if (job.equipmentProcedure === "100") {
-        job.equipmentProcedureOther = ("#textareaEquipmentProcedure").val();
+        job.equipmentProcedureOther = $("#textareaEquipmentProcedure").val();
     }
 
-    job.notes = ("#textareaJobNotes").val();
+    job.notes = $("#textareaJobNotes").val();
 
-    job.status = ("#inputJobStatus").val();
+    job.status = $("#inputJobStatus").val();
 
-    job.priority = (".jobEditCardDetailsPriority").find(".card-body-header .badge").attr("data-code");
+    job.priority = $(".jobEditCardDetailsPriority").find(".card-body-header .badge").attr("data-code");
  
     editJobInfoAjax(job, (success) => {
         if (!success) {
@@ -519,34 +526,34 @@ function saveJobInformation(){
 }
 
 function createJobInformation() {
-    let container = ("#newCreateServiceContainer");
+    let container = $("#newCreateServiceContainer");
 
     let job = new JobInfo(0);
 
-    job.equipmentType = ("#inputEquipmentType1").val();
+    job.equipmentType = $("#inputEquipmentType1").val();
     if (job.equipmentType === "100") {
-        job.equipmentTypeOther = ("#textareaEquipmentType1").val();
+        job.equipmentTypeOther = $("#textareaEquipmentType1").val();
     }
 
-    job.equipmentBrand = ("#inputEquipmentBrand1").val();
+    job.equipmentBrand = $("#inputEquipmentBrand1").val();
 
-    job.equipmentProcedure = ("#inputEquipmentProcedure1").val();
+    job.equipmentProcedure = $("#inputEquipmentProcedure1").val();
     if (job.equipmentProcedure === "100") {
-        job.equipmentProcedureOther = ("#textareaEquipmentProcedure1").val();
+        job.equipmentProcedureOther = $("#textareaEquipmentProcedure1").val();
     }
 
-    job.notes = ("#textareaJobNotes1").val();
+    job.notes = $("#textareaJobNotes1").val();
     if (job.notes === "") {
         job.notes = null;
     }
 
-    job.status = ("#inputJobStatus1").val();
+    job.status = $("#inputJobStatus1").val();
 
     job.userId = userDetails.id;
 
-    job.userIdClient = parseInt(("#dropCreateClient").val());
+    job.userIdClient = parseInt($("#dropCreateClient").val());
 
-    job.priority = (".jobCreateCardDetailsPriority").find(".card-body-header .badge").attr("data-code");
+    job.priority = $(".jobCreateCardDetailsPriority").find(".card-body-header .badge").attr("data-code");
 
     if (job.userIdClient === 0) {
         alert("Cliente tem de ser especificado.");
@@ -568,20 +575,20 @@ function createJobInformation() {
 
 //============================================= HELPER FUNCTIONS
 function getCurrentTypeStatusJobScreen(){
-    let option = ("#dropDownTypeJobList").val();
+    let option = $("#dropDownTypeJobList").val();
     return new JobTyperequest(option, option === "ME" ? userDetails.id : 0);
 }
 
 function editJobOpenModal(jobId){
     let job = jobsArray.filter((j)=>{ return j.JOB_ID === jobId; })[0];
   
-    let dropEquipmentType = ("#inputEquipmentType");
+    let dropEquipmentType = $("#inputEquipmentType");
     dropEquipmentType.find(`option[value='${job.EQUIPMENT_TYPE}']`).prop("selected", true);
 
-    let dropEquipmentBrand = ("#inputEquipmentBrand");
+    let dropEquipmentBrand = $("#inputEquipmentBrand");
     dropEquipmentBrand.find(`option[value='${job.EQUIPMENT_BRAND}']`).prop("selected", true);
 
-    let dropEquipmentTypeTextarea = ("#textareaEquipmentType");
+    let dropEquipmentTypeTextarea = $("#textareaEquipmentType");
     let dropEquipmentTypeTextareaContent = dropEquipmentTypeTextarea.parent();
 
     if (job.EQUIPMENT_TYPE === "100") {  
@@ -594,10 +601,10 @@ function editJobOpenModal(jobId){
         dropEquipmentTypeTextareaContent.addClass("textareaEquipmentTypeDescription");
     }
 
-    let dropEquipmentProcedure = ("#inputEquipmentProcedure");
+    let dropEquipmentProcedure = $("#inputEquipmentProcedure");
     dropEquipmentProcedure.find(`option[value='${job.EQUIPMENT_PROCEDURE}']`).prop("selected", true);
 
-    let dropEquipmentProcedureTextarea = ("#textareaEquipmentProcedure");
+    let dropEquipmentProcedureTextarea = $("#textareaEquipmentProcedure");
     let dropEquipmentProcedureTextareaContent = dropEquipmentProcedureTextarea.parent();
 
     if (job.EQUIPMENT_PROCEDURE === "100") {          
@@ -610,29 +617,29 @@ function editJobOpenModal(jobId){
         dropEquipmentProcedureTextareaContent.addClass("textareaEquipmentProcedureDescription");
     }
 
-    let notes = ("#textareaJobNotes");
+    let notes = $("#textareaJobNotes");
     notes.val(job.NOTES);
 
-    let clientName =  ("#inputClientName");
+    let clientName =  $("#inputClientName");
     clientName.val(job.CLIENT_NAME);
 
-    let clientEmail = ("#inputClientEmail");
+    let clientEmail = $("#inputClientEmail");
     clientEmail.val(job.CLIENT_EMAIL);
 
-    let clientNif = ("#inputClientNif");
+    let clientNif = $("#inputClientNif");
     clientNif.val(job.CLIENT_NIF);
 
-    let editJobStatus = ("#inputJobStatus");
+    let editJobStatus = $("#inputJobStatus");
     editJobStatus.find(`option[value='${job.STATUS_PROGRESS_CODE}']`).prop("selected", true);
     editJobStatus.find(`option[value='4']`).show();
 
     setPriorityCard(job.PRIORITY_CODE, "jobEditCardDetailsPriority");
     
-    let divInfoFinalised = (".editJobFinalisedDiv");
+    let divInfoFinalised = $(".editJobFinalisedDiv");
 
-    let buttonReopenJob = (".newServiceContainerOuterBodyFooter .btnReopen");
+    let buttonReopenJob = $(".newServiceContainerOuterBodyFooter .btnReopen");
 
-    let jobEditCardDetailsPriority = (".jobEditCardDetailsPriority").find(".card-body-body");
+    let jobEditCardDetailsPriority = $(".jobEditCardDetailsPriority").find(".card-body-body");
     
     if (job.STATUS_PROGRESS_CODE === "4") {
         dropEquipmentType.attr("disabled", "disabled");
@@ -670,7 +677,7 @@ function editJobOpenModal(jobId){
         buttonReopenJob.hide();
     }
 
-    let container = ("#newServiceContainer");
+    let container = $("#newServiceContainer");
     container.attr("data-jobId", jobId);
     container.show();
 }
@@ -680,7 +687,7 @@ function setPriorityCard(prioritySelected, classCard){
     // console.log(prioritySelected);
     // console.log(priorityList);
 
-    let jobCardDetailsPriority = (`.${classCard}`);
+    let jobCardDetailsPriority = $(`.${classCard}`);
     let jobCardDetailsPriorityHeader = jobCardDetailsPriority.find(".card-body-header");
     let jobCardDetailsPriorityBody = jobCardDetailsPriority.find(".card-body-body");
     jobCardDetailsPriorityHeader.empty();

@@ -1,52 +1,57 @@
 "use strict";
-const { userDetails, User, saveUsersLocalStorage, getUsersLocalStorage } = require('./helper.js');
 
+import {
+    userDetails,
+    User,
+    saveUsersLocalStorage,
+    getUsersLocalStorage
+} from "./helper.js";
 
 var usersArray = [];
 var usersTable = null;
 var pageSettings;
 
-(document).ready(()=> {
-    ("#buttonNewUserOpenModel").on("click", function(event){
+$(document).ready(()=> {
+    $("#buttonNewUserOpenModel").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         createNewUserModal();
     });
 
-    ("#buttonNewUserSave").on("click", function(event){
+    $("#buttonNewUserSave").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         createNewUserModalVerification();
     });
 
-    ("#buttonEditUserDelete").on("click", function(event){
+    $("#buttonEditUserDelete").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkUserModalToDelete();
     });
 
-    ("#buttonDeleteUserCancel").on("click", function(event){
+    $("#buttonDeleteUserCancel").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkUserModalToDeleteButton(false);
     });
 
-    ("#buttonDeleteUserConfirm").on("click", function(event){
+    $("#buttonDeleteUserConfirm").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkUserModalToDeleteButton(true);
     });
 
-    ("#buttonEditUserSave").on("click", function(event){
+    $("#buttonEditUserSave").on("click", function(event){
         event.stopPropagation();
         event.preventDefault();
         checkUserModalToSave();
     });
 
-    (document).on("click", "#usersTable tbody tr td:last-child i", function(e){
+    $(document).on("click", "#usersTable tbody tr td:last-child i", function(e){
         e.preventDefault();
         e.stopPropagation();
-        const userId = parseInt((this).attr("data-userId"));
+        const userId = parseInt($(this).attr("data-userId"));
         openUserModalToEdit(userId); 
     });
 
@@ -56,7 +61,7 @@ var pageSettings;
 
 
 function loadAllUsers() {
-    let table = ("#usersTable"); 
+    let table = $("#usersTable"); 
 
     getUsersAjax((users)=>{
         usersArray = users;
@@ -85,7 +90,7 @@ function loadAllUsers() {
             paging: true,
             order: [],
             fnRowCallback: function(row) {
-                (row).attr("scope", "row");     
+                $(row).attr("scope", "row");     
             },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
@@ -122,8 +127,8 @@ function loadPageSettings(){
     loadPageSettingsAjax((settings)=>{
         pageSettings = settings;
         //console.log(pageSettings);
-        let inpEditUserType = ("#inpEditUserType");
-        let inpUserType = ("#inpUserType");
+        let inpEditUserType = $("#inpEditUserType");
+        let inpUserType = $("#inpUserType");
 
         pageSettings[0].forEach((code)=>{
             inpEditUserType.append(`<option value='${code.code}'>${code.description}</option>`);
@@ -133,7 +138,7 @@ function loadPageSettings(){
 }
 
 function createNewUserModal(){
-    let modal = ("#modalCreateUser");
+    let modal = $("#modalCreateUser");
     modal.find("#inpCreateName").val("");
     modal.find("#inpCreateUserName").val("");
     modal.find("#inpCreateEmail").val("");
@@ -145,7 +150,7 @@ function createNewUserModal(){
 }
 
 function createNewUserModalVerification(){
-    let modal = ("#modalCreateUser");
+    let modal = $("#modalCreateUser");
 
     let name = modal.find("#inpCreateName").val();
     let userName = modal.find("#inpCreateUserName").val();
@@ -224,7 +229,7 @@ function createNewUserModalVerification(){
 function openUserModalToEdit(userId){    
     const user = usersArray.filter((u)=>{ return u.id === userId; })[0];
     //console.log(user);
-    let modal = ("#modalEditUser");
+    let modal = $("#modalEditUser");
     modal.attr("data-id", userId);
 
     modal.find("#inpEditName").val("");
@@ -243,12 +248,12 @@ function openUserModalToEdit(userId){
 }
 
 function checkUserModalToDelete(){
-    let modalEdit = ("#modalEditUser");    
+    let modalEdit = $("#modalEditUser");    
     const userId = parseInt(modalEdit.attr("data-id"));
 
     modalEdit.on('hidden.bs.modal', function () {
-        (this).off('hidden.bs.modal');
-        let modalMessage = ("#modalMessage");
+        $(this).off('hidden.bs.modal');
+        let modalMessage = $("#modalMessage");
         modalMessage.find(".modal-body p").text("Tem a certeza que quer remover este utilizador?");
         modalMessage.attr("data-id", userId);
         modalMessage.modal("show");
@@ -257,15 +262,15 @@ function checkUserModalToDelete(){
 }
 
 function checkUserModalToDeleteButton(toDelete){
-    let modalMessage = ("#modalMessage");
-    let modalEdit = ("#modalEditUser"); 
+    let modalMessage = $("#modalMessage");
+    let modalEdit = $("#modalEditUser"); 
     const userId = parseInt(modalMessage.attr("data-id"));
 
     showHideModalErrorMessage(modalEdit, false);
 
     if (!toDelete) {
         modalMessage.on('hidden.bs.modal', function () {
-            (this).off('hidden.bs.modal');
+            $(this).off('hidden.bs.modal');
             modalEdit.modal("show");
         });
         modalMessage.modal("hide");
@@ -275,7 +280,7 @@ function checkUserModalToDeleteButton(toDelete){
     deleteUserAjax(userId, (success)=>{
         if (!success) {
             modalMessage.on('hidden.bs.modal', function () {
-                (this).off('hidden.bs.modal');
+                $(this).off('hidden.bs.modal');
                 showHideModalErrorMessage(modalEdit, true, "Algo correu mal. Tente outravez.");
                 modalEdit.modal("show");
             });
@@ -289,7 +294,7 @@ function checkUserModalToDeleteButton(toDelete){
 }
 
 function checkUserModalToSave() {
-    let modal = ("#modalEditUser");    
+    let modal = $("#modalEditUser");    
     const userId = parseInt(modal.attr("data-id"));
 
     showHideModalErrorMessage(modal, false);

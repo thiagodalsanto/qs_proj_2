@@ -1,39 +1,44 @@
 "use strict";
-const mysql = require("mysql2"); // Use mysql2 para compatibilidade com MySQL 8.0+
-const options = require("./connection-options.json");
+import { createConnection } from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.login = (request, response) => {
-    let connection = mysql.createConnection(options);
-    connection.connect((err) => {
-        if (err) {
-            response.status(500).send("Erro ao conectar ao banco de dados");
-            return;
-        }
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
 
-        let query = `
-            SELECT U.id, U.userName, U.name, U.email, 
-            U.role AS roleCode, ROLE_CODE.description AS roleDescription 
-            FROM user U
-            INNER JOIN codes ROLE_CODE ON ROLE_CODE.code = U.role
-            WHERE (U.userName = ? OR U.email = ?) AND U.password = ?
-        `;
+export function login(request, response) {
+  let connection = createConnection(options);
+  connection.connect((err) => {
+    if (err) {
+      console.error("Error connecting to the database:", err.stack);
+      response.sendStatus(500);
+      return;
+    }
+    console.log("Connected to the database as id " + connection.threadId);
+  });
+  let query = `
+        SELECT U.id, U.userName, U.name, U.email, 
+        U.ROLE AS roleCode, ROLE_CODE.DESCRIPTION AS roleDescription 
+        FROM USER U
+        INNER JOIN CODES ROLE_CODE ON ROLE_CODE.CODE = U.ROLE
+        WHERE (U.USERNAME = ? OR U.email = ?) AND U.PASSWORD = ?
+    `;
 
-        connection.query(query, [request.body.login, request.body.login, request.body.password], function (err, results) {
-            if (err) {
-                response.status(500).send("Erro ao executar a query");
-                connection.end();
-                return;
-            }
-
-            if (results.length === 0) {
-                response.status(401).send("Usuário ou senha incorretos");
-                connection.end();
-                return;
-            }
-
-            request.session.User = results[0];
-            response.status(200).send(JSON.stringify(results[0]));
-            connection.end();
-        });
-    });
-};
+  connection.query(
+    query,
+    [request.body.login, request.body.login, request.body.password],
+    function (err, row) {
+      if (err) {
+        response.sendStatus(500);
+      } else if (row.length === 0) {
+        response.sendStatus(401);
+      } else {
+        //Add user to the session
+        request.session.User = row[0];
+        response.send(JSON.stringify(row[0]));
+      }
+    }
+  );
+}
