@@ -1,13 +1,14 @@
 "use strict";
 
-import {
-    Client,
-    saveClientsLocalStorage,
-    getClientsLocalStorage
-} from "./helper.js";
+const Client = require["./helper.js"];
+const saveClientsLocalStorage = require["./helper.js"];
+const getClientsLocalStorage = require["./helper.js"];
+
+
 
 var clientsArray = [];
 var clientTable = null;
+
 
 $(document).ready(()=> {
     $("#buttonNewClientSave").on("click", function(event){

@@ -1,7 +1,7 @@
 "use strict";
 
 //============================================================= Logout
-export const logout = (request, response) => {
+module.exports.logout = (request, response) => {
     request.session.User = undefined;
     response.sendStatus(200);
 }

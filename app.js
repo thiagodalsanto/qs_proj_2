@@ -1,28 +1,23 @@
 "use strict";
-import express from "express";
-import { getClients, editClient, deleteClient, createClient } from "./scripts/clients-handlers.js";
-import { getUsers, getPageSettings, createUser, editUser, deleteUser } from "./scripts/users-handlers.js";
-import { login } from "./scripts/authentication-handlers.js";
-import { logout } from "./scripts/globalHandlers.js";
-import { getListJobs, createJob, getUserInfoInitState, reopenJob, editJobInfo, editOrderPriority } from "./scripts/jobs-handlers.js";
-import { loadWebSocketSettings, loadWebSocketMessages, messagingInsertNew } from "./scripts/messaging-handlers.js";
-import bodyParser from "body-parser"; // Default import
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const express = require("express");
+const clientsHandlers = require("./scripts/clients-handlers.js");
+const usersHandlers = require("./scripts/users-handlers.js");
+const authenticationHandlers = require("./scripts/authentication-handlers.js");
+const globalHandlers = require("./scripts/globalHandlers.js");
+const jobsHandlers = require("./scripts/jobs-handlers.js");
+const messagingHandlers = require("./scripts/messaging-handlers.js");
+const bodyParser = require("body-parser");
 const app = express();
-import session from "express-session";
-import { join } from "path";
-import { existsSync } from 'fs';
+const session = require("express-session");
+const path = require("path");
+const fs = require('fs');
 
-import { createServer } from "http"; 
-import { server as WebSocketServer } from 'websocket';
+const http = require("http"); 
+const WebSocketServer = require('websocket').server;
+ 
 
-// Destructure json and urlencoded from bodyParser
-const { json, urlencoded } = bodyParser;
 
-app.use(json());
+app.use(bodyParser.json());
 
 app.use(session({
     secret: "ThisIsOurSecretKeyToGenerateSessionButWeShouldUseUUID",
@@ -61,8 +56,8 @@ app.use((request, response, next) => {
         return;
     }
 
-    const currentPath = join(__dirname, "www", url);
-    if (!existsSync(currentPath)) {
+    const currentPath = path.join(__dirname, "www", url);
+    if (!fs.existsSync(currentPath)) {
         response.redirect("/login.html");
         return;
     }
@@ -71,50 +66,50 @@ app.use((request, response, next) => {
 });
 
 
-app.use(urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("www"));
 
 //============================================================= Ajax Messinging
-app.post("/api/loadWebSocketSettings", loadWebSocketSettings);
-app.post("/api/loadWebSocketMessages", loadWebSocketMessages);
+app.post("/api/loadWebSocketSettings", messagingHandlers.loadWebSocketSettings);
+app.post("/api/loadWebSocketMessages", messagingHandlers.loadWebSocketMessages);
 
 
 
 //============================================================= Ajax Client Page
-app.get("/api/getClients", getClients);
-app.put("/api/editClient", editClient);
-app.delete("/api/deleteClient/:id", deleteClient);
-app.post("/api/createClient", createClient);
+app.get("/api/getClients", clientsHandlers.getClients);
+app.put("/api/editClient", clientsHandlers.editClient);
+app.delete("/api/deleteClient/:id", clientsHandlers.deleteClient);
+app.post("/api/createClient", clientsHandlers.createClient);
 
 //============================================================= Ajax Users Page
-app.get("/api/getUsers", getUsers);
-app.get("/api/getPageSettings", getPageSettings);
-app.post("/api/createUser", createUser);
-app.put("/api/editUser", editUser);
-app.delete("/api/deleteUser/:id", deleteUser);
+app.get("/api/getUsers", usersHandlers.getUsers);
+app.get("/api/getPageSettings", usersHandlers.getPageSettings);
+app.post("/api/createUser", usersHandlers.createUser);
+app.put("/api/editUser", usersHandlers.editUser);
+app.delete("/api/deleteUser/:id", usersHandlers.deleteUser);
 
 //============================================================= Ajax Login Page
-app.post("/api/login", login);
+app.post("/api/login", authenticationHandlers.login);
 
 
 //============================================================= Ajax Home Page
-app.post("/api/getListJobs", getListJobs);
-app.post("/api/createJob", createJob);
-app.get("/api/getUserInfoInitState", getUserInfoInitState);
-app.put("/api/reopenJob", reopenJob);
-app.put("/api/editJobInfo", editJobInfo);
-app.put("/api/editOrderPriority", editOrderPriority);
+app.post("/api/getListJobs", jobsHandlers.getListJobs);
+app.post("/api/createJob", jobsHandlers.createJob);
+app.get("/api/getUserInfoInitState", jobsHandlers.getUserInfoInitState);
+app.put("/api/reopenJob", jobsHandlers.reopenJob);
+app.put("/api/editJobInfo", jobsHandlers.editJobInfo);
+app.put("/api/editOrderPriority", jobsHandlers.editOrderPriority);
 
 
 //============================================================= Ajax Global
-app.get("/api/logout", logout);
+app.get("/api/logout", globalHandlers.logout);
 
 
 app.listen(8081, function () {
     console.log("Server running at http://localhost:8081");
 });
 
-const server = createServer(function () { });
+const server = http.createServer(function () { });
 server.listen(7071);
 
 const wsServer = new WebSocketServer({
@@ -152,10 +147,10 @@ function connectMessage(message){
     const idToSendMessage = message.to;
     let client = findClientById(idToSendMessage);
     if (client === null) {
-        messagingInsertNew(message, ()=> {});
+        messagingHandlers.messagingInsertNew(message, ()=> {});
         return;
     }
-    messagingInsertNew(message, (row)=> {
+    messagingHandlers.messagingInsertNew(message, (row)=> {
         if (row === -1) {
             return;
         }

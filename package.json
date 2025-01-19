@@ -2,13 +2,11 @@
   "name": "pw-lab07",
   "description": "Lab 07 da UC PW",
   "version": "1.0.0",
-  "type": "module",
   "dependencies": {
     "body-parser": "^1.19.1",
     "cookie-parser": "^1.4.6",
     "express": "^4.17.2",
     "express-session": "^1.17.2",
-    "fs": "^0.0.1-security",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "mysql2-promise": "^0.1.4",
@@ -20,7 +18,8 @@
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "eslint": "^9.18.0",
-    "eslint-config-jquery": "^3.0.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jquery": "^1.5.1",
     "globals": "^15.14.0"
   }
 }

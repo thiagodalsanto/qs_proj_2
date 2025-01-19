@@ -1,15 +1,9 @@
 "use strict";
-import { createConnection } from "mysql2";
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+const mysql = require("mysql2");
+const options = require("./connection-options.json");
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const optionsPath = join(__dirname, 'connection-options.json');
-const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
-
-export function login(request, response) {
-  let connection = createConnection(options);
+module.exports.login = (request, response) => {
+  let connection = mysql.createConnection(options);
   connection.connect((err) => {
     if (err) {
       console.error("Error connecting to the database:", err.stack);
@@ -41,4 +35,4 @@ export function login(request, response) {
       }
     }
   );
-}
+};
