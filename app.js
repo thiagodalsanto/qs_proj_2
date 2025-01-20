@@ -111,6 +111,7 @@ app.get("/api/logout", logout);
 
 
 app.listen(8081, function () {
+    // eslint-disable-next-line no-undef
     console.log("Server running at http://localhost:8081");
 });
 

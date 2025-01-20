@@ -7,10 +7,28 @@
     - [Requisitos Não Funcionais](#22-requisitos-não-funcionais)
     - [Proposta de Requisitos Adicionais](#23-proposta-de-requisitos-adicionais)
 3. [Correção com o ESLint](#3-correção-com-o-eslint)
-4. [Testes Automatizados com (Jest ou Mocha)](#4-testes-automatizados-com-jest-ou-mocha)
-5. [Análise da Aplicação com a ISO ...](#5-análise-da-aplicação-com-a-iso-)
+    - [O que é o ESLint?](#31-o-que-é-o-eslint)
+    - [Configuração do ESLint no Projeto](#32-configuração-do-eslint-no-projeto)
+    - [Resultados da Análise com o ESLint](#33-resultados-da-análise-com-o-eslint)
+    - [Impacto dos Erros Identificados](#34-impacto-dos-erros-identificados)
+4. [Testes Automatizados com Mocha e Chai](#4-testes-automatizados-com-mocha-e-chai)
+    - [Introdução ao Mocha e Chai](#41-introdução-ao-mocha-e-chai)
+    - [Configuração do Mocha](#42-configuração-do-mocha)
+    - [Estrutura dos Testes](#43-estrutura-dos-testes)
+    - [Exemplo de Teste: `authentication-handlers.test.js`](#44-exemplo-de-teste-authentication-handlerstestjs)
+    - [Resultados dos Testes](#45-resultados-dos-testes)
+    - [Melhorias Implementadas](#46-melhorias-implementadas)
+5. [Análise da Aplicação com a ISO/IEC 25010](#5-análise-da-aplicação-com-a-isoiec-25010)
+    - [Explorando a ISO/IEC 25010](#51-explorando-a-isoiec-25010)
+    - [Crítica ao Projeto sob a Ótica da ISO/IEC 25010](#52-crítica-ao-projeto-sob-a-ótica-da-isoiec-25010)
+        - [Funcionalidade](#521-funcionalidade)
+        - [Confiabilidade](#522-confiabilidade)
+        - [Usabilidade](#523-usabilidade)
+        - [Eficiência](#524-eficiência)
+        - [Manutenibilidade](#525-manutenibilidade)
+        - [Segurança](#526-segurança)
+        - [Compatibilidade](#527-compatibilidade)
 6. [Conclusão](#6-conclusão)
-7. [Referências](#7-referências)
 
 ## 1. Contextualização Sobre a Aplicação
 
@@ -113,10 +131,277 @@ Os requisitos adicionais propostos visam aumentar a eficiência operacional da a
 
 ## 3. Correção com o ESLint
 
-## 4. Testes Automatizados com (Jest ou Mocha)
+### 3.1. O que é o ESLint?
 
-## 5. Análise da Aplicação com a ISO ...
+O **ESLint** é uma ferramenta de análise estática de código amplamente utilizada para identificar e corrigir problemas em códigos JavaScript. Ele ajuda a manter a consistência do código, aplicando regras de estilo e boas práticas de programação. O ESLint é altamente configurável, permitindo que equipes de desenvolvimento definam suas próprias regras ou utilizem configurações pré-definidas, como as do **ESLint Recommended** ou de plugins como o **Airbnb JavaScript Style Guide**.
+
+Além de identificar erros de sintaxe, o ESLint pode detectar problemas como variáveis não declaradas, uso de funções obsoletas, más práticas de programação e até mesmo problemas de segurança. Ele é uma ferramenta essencial para garantir a qualidade do código, especialmente em projetos grandes ou com múltiplos desenvolvedores.
+
+
+### 3.2. Configuração do ESLint no Projeto
+
+No projeto em análise, o ESLint foi configurado para analisar os arquivos JavaScript nas pastas `www/scripts/` e `scripts/`, além do arquivo `app.js`. A configuração utilizada é a seguinte:
+
+```javascript
+import globals from "globals";
+import pluginJs from "@eslint/js";
+
+/** @type {} */
+export default [
+  {
+    files: ["**/www/scripts/*.js", "**/scripts/*.js"],
+    languageOptions: {
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.jquery,
+      },
+    },
+  },
+  pluginJs.configs.recommended,
+];
+```
+
+#### Detalhes da Configuração:
+1. **Arquivos Analisados**:
+   - A configuração aplica-se a todos os arquivos JavaScript (`*.js`) nas pastas `www/scripts/` e `scripts/`.
+2. **Ambiente**:
+   - O ESLint foi configurado para reconhecer variáveis globais específicas de navegadores (`globals.browser`) e do jQuery (`globals.jquery`), o que é útil para projetos que utilizam essas tecnologias.
+3. **Regras Recomendadas**:
+   - A configuração utiliza as regras recomendadas do ESLint (`pluginJs.configs.recommended`), que são um conjunto de boas práticas amplamente aceitas na comunidade JavaScript.
+
+
+### 3.3. Resultados da Análise com o ESLint
+
+A análise do ESLint identificou **106 erros** em **12 arquivos** JavaScript. Esses erros podem ser categorizados em diferentes tipos, como:
+
+1. **Erros de Sintaxe**:
+   - Uso incorreto de ponto e vírgula (`;`).
+   - Parênteses, colchetes ou chaves mal fechados.
+   - Uso incorreto de aspas simples (`'`) ou duplas (`"`).
+
+2. **Problemas de Estilo**:
+   - Indentação inconsistente (espaços vs. tabs).
+   - Linhas muito longas, excedendo o limite recomendado de caracteres.
+   - Uso de variáveis não declaradas ou declaradas mas não utilizadas.
+
+3. **Boas Práticas**:
+   - Uso de funções obsoletas ou desencorajadas.
+   - Falta de tratamento de erros em operações assíncronas.
+   - Uso de `==` em vez de `===` para comparações estritas.
+
+4. **Problemas de Segurança**:
+   - Uso de `eval()` ou funções semelhantes que podem introduzir vulnerabilidades.
+   - Falta de validação de entradas do usuário em operações críticas.
+
+![ESLint Erros](assets/eslint_nao_corrigido.png)
+
+### 3.4. Impacto dos Erros Identificados
+
+Os erros identificados pelo ESLint podem ter impactos significativos no projeto, incluindo:
+
+1. **Redução da Qualidade do Código**:
+   - Código inconsistente ou difícil de ler pode dificultar a manutenção e o desenvolvimento futuro.
+2. **Problemas de Funcionamento**:
+   - Erros de sintaxe ou lógica podem levar a comportamentos inesperados ou falhas no sistema.
+3. **Riscos de Segurança**:
+   - Práticas inseguras, como o uso de `eval()`, podem expor o sistema a vulnerabilidades.
+4. **Dificuldade de Colaboração**:
+   - Código que não segue padrões consistentes pode dificultar a colaboração entre desenvolvedores.
+
+Após isso, foi corrigo os erros, tendo o seguinte retorno do ESLint:
+
+![ESLint Erros](assets/eslint_corrigido.png)
+
+## 4. Testes Automatizados com Mocha e Chai
+## 4. Testes Automatizados com Mocha e Chai
+
+### 4.1. Introdução ao Mocha e Chai
+
+O **Mocha** é um framework de testes para JavaScript que permite a execução de testes de forma organizada e eficiente. Ele é altamente flexível e suporta diferentes estilos de escrita de testes (BDD, TDD, etc.). Já o **Chai** é uma biblioteca de asserções que pode ser usada em conjunto com o Mocha para verificar se os resultados dos testes estão de acordo com o esperado.
+
+No projeto em análise, foram escritos **40 testes** utilizando Mocha e Chai para validar as funcionalidades da aplicação. Inicialmente, antes das correções, apenas **22 dos 40 testes** passaram, o que indica a necessidade de ajustes no código para garantir que todas as funcionalidades estejam funcionando corretamente.
+
+
+### 4.2. Configuração do Mocha
+
+O Mocha foi configurado utilizando o arquivo `.mocharc.js`, que define as opções de execução dos testes. A configuração utilizada é a seguinte:
+
+```javascript
+module.exports = {
+    spec: 'test/**/*.test.js', // Define onde os testes estão localizados
+    timeout: 5000, // Tempo máximo de execução para cada teste
+    reporter: 'spec' // Formato do relatório de testes
+};
+```
+
+#### Detalhes da Configuração:
+1. **`spec`**: Define o padrão de arquivos de teste a serem executados. Neste caso, todos os arquivos com extensão `.test.js` dentro da pasta `test/` serão considerados.
+2. **`timeout`**: Define o tempo máximo (em milissegundos) que um teste pode levar para ser executado antes de ser considerado falho.
+3. **`reporter`**: Define o formato do relatório de testes. O formato `spec` é um dos mais utilizados, pois exibe os resultados de forma detalhada e organizada.
+
+### 4.3. Estrutura dos Testes
+
+Os testes foram organizados em diferentes arquivos, cada um focado em uma funcionalidade específica da aplicação. Abaixo estão os principais arquivos de teste e suas respectivas funcionalidades:
+
+1. **`authentication-handlers.test.js`**:
+   - Testes relacionados à autenticação de usuários, como login, validação de credenciais e manipulação de sessões.
+
+2. **`clients-handlers.test.js`**:
+   - Testes para o gerenciamento de clientes, incluindo criação, edição, exclusão e listagem.
+
+3. **`globalHandlers.test.js`**:
+   - Testes para funcionalidades globais, como logout.
+
+4. **`jobs-handlers.test.js`**:
+   - Testes para o gerenciamento de trabalhos (jobs), incluindo criação, edição, reabertura e priorização.
+
+5. **`messaging-handlers.test.js`**:
+   - Testes para o sistema de mensagens em tempo real, incluindo envio, recebimento e carregamento de histórico.
+
+6. **`users-handlers.test.js`**:
+   - Testes para o gerenciamento de usuários, incluindo criação, edição, exclusão e listagem.
+
+
+### 4.4. Exemplo de Teste: `authentication-handlers.test.js`
+
+Abaixo está um exemplo de teste para a função de login, que verifica se o sistema retorna o status correto em caso de falha na conexão com o banco de dados:
+
+```javascript
+it("deve retornar status 500 quando ocorre um erro na conexão com o banco de dados", () => {
+    mockConnection.connect.callsArgWith(0, new Error("Falha na conexão"));
+
+    authenticationHandlers.login(mockRequest, mockResponse);
+
+    expect(mockResponse.sendStatus.calledWith(500)).to.be.true;
+});
+```
+
+#### Detalhes do Teste:
+1. **Cenário**: Simula uma falha na conexão com o banco de dados.
+2. **Ação**: Chama a função `login` do handler de autenticação.
+3. **Verificação**: Verifica se o status retornado é `500` (erro interno do servidor).
+
+### 4.5. Resultados dos Testes
+
+Antes das correções, apenas **22 dos 40 testes** passaram, o que indica problemas em diversas funcionalidades da aplicação. Abaixo estão alguns dos principais problemas identificados:
+
+1. **Falhas na Autenticação**:
+   - Problemas na validação de credenciais e no tratamento de erros de conexão com o banco de dados.
+
+2. **Gerenciamento de Clientes**:
+   - Falhas na criação, edição e exclusão de clientes, especialmente em cenários de erro.
+
+3. **Gerenciamento de Trabalhos (Jobs)**:
+   - Problemas na priorização de trabalhos e na reabertura de jobs concluídos.
+
+4. **Sistema de Mensagens**:
+   - Falhas no envio e recebimento de mensagens em tempo real.
+
+5. **Gerenciamento de Usuários**:
+   - Problemas na criação, edição e exclusão de usuários.
+
+![ESLint Erros](assets/mocha_nao_corrigido.png)
+
+### 4.6. Melhorias Implementadas
+
+Após a identificação dos problemas, as seguintes melhorias foram implementadas:
+
+1. **Correção de Erros de Conexão com o Banco de Dados**:
+   - Adição de tratamento de erros para garantir que a aplicação não quebre em caso de falha na conexão.
+
+2. **Validação de Dados**:
+   - Implementação de validações adicionais para garantir que os dados inseridos pelos usuários estejam corretos.
+
+3. **Melhoria na Priorização de Trabalhos**:
+   - Correção de bugs na funcionalidade de arrastar e soltar para reordenar prioridades.
+
+4. **Refatoração do Código**:
+   - Melhoria na modularização do código para facilitar a manutenção e a escrita de novos testes.
+
+5. **Adição de Novos Testes**:
+   - Criação de novos testes para cobrir cenários que não haviam sido testados anteriormente.
+
+Após isso, o código passou em todos os 40 testes, como pode ser visto na imagem abaixo:
+![ESLint Erros](assets/mocha_corrigido.png)
+
+## 5. Análise da Aplicação com a ISO/IEC 25010
+
+A ISO/IEC 25010 é uma norma internacional que define um modelo de qualidade para sistemas e software. Ela substituiu a antiga ISO/IEC 9126 e é amplamente utilizada para avaliar a qualidade de produtos de software. A norma divide a qualidade do software em oito características principais, que são subdivididas em subcaracterísticas. Essas características são:
+
+1. Funcionalidade: Avalia se o software atende às necessidades e expectativas dos usuários, considerando subcaracterísticas como adequação, exatidão, interoperabilidade, segurança e conformidade.
+2. Confiabilidade: Mede a capacidade do software de manter seu desempenho sob condições específicas, incluindo maturidade, disponibilidade, tolerância a falhas e recuperabilidade.
+3. Usabilidade: Avalia a facilidade com que os usuários podem interagir com o software, considerando subcaracterísticas como compreensibilidade, aprendizado, operabilidade, atratividade e conformidade de usabilidade.
+4. Eficiência: Mede o desempenho do software em relação ao uso de recursos, incluindo tempo de resposta, utilização de recursos e capacidade.
+5. Manutenibilidade: Avalia a facilidade com que o software pode ser modificado para corrigir defeitos, melhorar desempenho ou adaptar-se a mudanças, considerando subcaracterísticas como modularidade, reusabilidade, analisabilidade, modificabilidade e testabilidade.
+6. Portabilidade: Mede a capacidade do software de ser transferido de um ambiente para outro, incluindo adaptabilidade, instalabilidade, substituibilidade e conformidade de portabilidade.
+7. Segurança: Avalia a capacidade do software de proteger informações e dados, garantindo confidencialidade, integridade, não repúdio, responsabilidade e autenticidade.
+8. Compatibilidade: Mede a capacidade do software de coexistir e interagir com outros sistemas, considerando interoperabilidade e conformidade de compatibilidade.
+
+A ISO/IEC 25010 é uma norma abrangente e flexível, permitindo que organizações adaptem sua aplicação conforme o contexto do projeto. Ela é amplamente utilizada para avaliar a qualidade de software em diferentes estágios do ciclo de vida, desde o desenvolvimento até a manutenção.
+
+### 5.1 Crítica ao Projeto sob a Ótica da ISO/IEC 25010
+
+Aplicando a ISO/IEC 25010 ao projeto em análise, podemos identificar pontos fortes e áreas que necessitam de melhorias:
+
+#### 5.1.1. Funcionalidade
+- Pontos Fortes:
+    - A aplicação atende a diversos requisitos funcionais, como autenticação de usuários, gerenciamento de clientes, criação de trabalhos e comunicação em tempo real via WebSocket.
+    - A interface é intuitiva e oferece funcionalidades como arrastar e soltar para priorizar trabalhos, o que melhora a experiência do usuário.
+- Áreas de Melhoria:
+    - A funcionalidade de login automático pode não funcionar corretamente em todos os cenários, o que afeta a adequação e exatidão do sistema.
+    - A validação de campos em formulários, como email e senha, pode não ser consistente, o que pode levar a erros ou inconsistências nos dados.
+
+#### 5.1.2. Confiabilidade
+- Pontos Fortes:
+    - A aplicação utiliza tecnologias robustas como Node.js e MySQL, que são conhecidas por sua confiabilidade e desempenho.
+- Áreas de Melhoria:
+    - Não há menção a mecanismos de tolerância a falhas ou recuperabilidade, como backups automáticos ou redundância de servidores.
+    - A exclusão de registros com dependências no banco de dados (como trabalhos associados a clientes) pode não estar sendo tratada de forma adequada, o que pode levar a inconsistências.
+
+#### 5.1.3. Usabilidade
+- Pontos Fortes:
+    - A interface é responsiva e utiliza bibliotecas como Bootstrap e DataTables, que melhoram a experiência do usuário.
+    - A navegação entre páginas é simples e intuitiva.
+- Áreas de Melhoria:
+    - A falta de feedback claro para ações do usuário, como mensagens de erro ou confirmações de exclusão, pode prejudicar a usabilidade.
+    - A funcionalidade de priorização de trabalhos pode apresentar problemas de funcionamento, o que afeta a operabilidade.
+
+#### 5.1.4. Eficiência
+- Pontos Fortes:
+    - A aplicação utiliza WebSocket para comunicação em tempo real, o que melhora a eficiência na transmissão de mensagens.
+- Áreas de Melhoria:
+    - O tempo de resposta da aplicação não foi avaliado, e não há garantias de que ele atenda ao requisito de menos de 2 segundos.
+    - A escalabilidade da aplicação (suporte a 100 usuários simultâneos) não foi testada.
+
+#### 5.1.5. Manutenibilidade
+- Pontos Fortes:
+    - O código é modular, com separação clara entre front-end e back-end, o que facilita a manutenção.
+- Áreas de Melhoria:
+    - A documentação do código e da API não foi mencionada, o que pode dificultar a manutenção e o desenvolvimento futuro.
+    - Não há menção a testes automatizados, o que é essencial para garantir a qualidade do código durante a manutenção.
+
+#### 5.1.6. Segurança
+- Pontos Fortes:
+    - A aplicação utiliza autenticação segura, com armazenamento de senhas em formato hash.
+- Áreas de Melhoria:
+Não há menção a proteções contra ataques comuns, como SQL injection, XSS ou CSRF.
+    - A funcionalidade de login automático pode representar um risco de segurança, especialmente se não for implementada corretamente.
+
+#### 5.1.7. Compatibilidade
+- Pontos Fortes:
+    - A aplicação foi desenvolvida com tecnologias amplamente compatíveis, como HTML, CSS, JavaScript, Node.js e MySQL.
+- Áreas de Melhoria:
+    - A compatibilidade com diferentes navegadores e dispositivos não foi explicitamente testada, o que pode levar a problemas de usabilidade em alguns cenários.
+
+A aplicação de gestão de reparação de componentes eletrônicos apresenta uma base sólida, com funcionalidades úteis e uma interface intuitiva. No entanto, sob a ótica da ISO/IEC 25010, identificamos várias áreas que necessitam de melhorias, especialmente em termos de segurança, confiabilidade e manutenibilidade. A implementação de medidas como testes automatizados, proteções contra ataques, feedback claro ao usuário e documentação detalhada pode elevar significativamente a qualidade do software, garantindo que ele atenda às expectativas dos usuários e aos padrões internacionais de qualidade.
 
 ## 6. Conclusão
 
-## 7. Referências
+Este relatório apresentou uma análise detalhada da aplicação de gestão de reparação de componentes eletrônicos, destacando seus pontos fortes e identificando áreas que necessitam de melhorias. Através da extração de requisitos, correção de erros com o ESLint, realização de testes automatizados com Mocha e Chai, e análise com base na norma ISO/IEC 25010, foi possível avaliar a qualidade do software sob diferentes perspectivas.
+
+A aplicação demonstra um bom desempenho em termos de funcionalidades essenciais, como autenticação de usuários, gerenciamento de clientes e trabalhos, e comunicação em tempo real via WebSocket. No entanto, foram identificados problemas relacionados à consistência na validação de dados, segurança, usabilidade e manutenibilidade. A correção desses problemas, juntamente com a implementação de melhorias sugeridas, como a adição de testes automatizados, proteções contra ataques comuns e documentação detalhada, pode elevar significativamente a qualidade do sistema.
+
+A utilização de ferramentas como ESLint e Mocha/Chai mostrou-se fundamental para garantir a consistência do código e a confiabilidade das funcionalidades. Além disso, a aplicação da ISO/IEC 25010 permitiu uma avaliação estruturada da qualidade do software, fornecendo insights valiosos para o aprimoramento contínuo do sistema.
+
+Em resumo, a aplicação possui uma base sólida e potencial para atender às necessidades dos usuários de forma eficiente e segura. Com as melhorias propostas, espera-se que o sistema continue evoluindo, mantendo-se alinhado às melhores práticas de desenvolvimento de software e às expectativas dos usuários.
