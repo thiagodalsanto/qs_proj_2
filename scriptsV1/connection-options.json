@@ -1,7 +1,0 @@
-{
-  "host": "localhost",
-  "user": "root",
-  "port": 3306,
-  "database": "qs_example",
-  "password": "root"
-}
