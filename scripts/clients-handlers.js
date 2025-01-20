@@ -1,8 +1,14 @@
 "use strict";
-const mysql = require("mysql2");
-const options = require("./connection-options.json");
+import mysql from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.getClients = (request, response) => {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
+
+export const getClients = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = `
@@ -25,7 +31,7 @@ module.exports.getClients = (request, response) => {
     });
 }
 
-module.exports.editClient = (request, response) => {
+export const editClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "UPDATE client SET name = ?, address = ?, postCode = ?, email = ?, nif = ? WHERE ID = ?";
@@ -41,7 +47,7 @@ module.exports.editClient = (request, response) => {
     });
 }
 
-module.exports.deleteClient = (request, response) => {
+export const deleteClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "DELETE FROM client WHERE id = ?";
@@ -57,7 +63,7 @@ module.exports.deleteClient = (request, response) => {
     });
 }
 
-module.exports.createClient = (request, response) => {
+export const createClient = (request, response) => {
     let connection = mysql.createConnection(options);
     connection.connect();
     let query = "INSERT INTO CLIENT (NAME, ADDRESS, POSTCODE, EMAIL, NIF) VALUES (?, ?, ?, ?, ?)";

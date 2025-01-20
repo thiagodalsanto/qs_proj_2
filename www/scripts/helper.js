@@ -57,7 +57,7 @@ function initUserDetailsAndRoles(){
 }
 
 //Test purposes only
-export function getBrowser(){
+function getBrowser(){
     if (window.navigator.userAgent.toLowerCase().indexOf("edg") > -1) {
         return "edge";
     }
@@ -66,7 +66,7 @@ export function getBrowser(){
 
 
 //===================================================================== Classes
-export class Client {    
+class Client {    
     constructor(id, name, address, postCode, email, nif) {
         this.id = id;
         this.name = name;
@@ -77,7 +77,7 @@ export class Client {
     }
 }
 
-export class User {
+class User {
     constructor(id, userName, name, email, role, password) {
         this.id = id;
         this.userName = userName;
@@ -88,7 +88,7 @@ export class User {
     }
 }
 
-export class JobInfo {
+class JobInfo {
     constructor(id) {
         this.id = id;
         this.userId = 0;
@@ -107,7 +107,7 @@ export class JobInfo {
     }
 }
 
-export class JobTyperequest {
+class JobTyperequest {
     constructor(type, identifier) {
         this.type = type;
         this.identifier = identifier;
@@ -192,7 +192,7 @@ function saveClientsLocalStorage(clients) {
     localStorage.setItem("clients", JSON.stringify(clients));
 }
 
-export function getClientsLocalStorage() {
+function getClientsLocalStorage() {
     if (!localStorage) {
         return [];
     }
@@ -220,7 +220,7 @@ function saveUsersLocalStorage(users) {
     localStorage.setItem("users", JSON.stringify(users));
 }
 
-export function getUsersLocalStorage() {
+function getUsersLocalStorage() {
     if (!localStorage) {
         return [];
     }
@@ -248,7 +248,7 @@ function saveUserJobsLocalStorage(jobs) {
     localStorage.setItem("user_jobs", JSON.stringify(jobs));
 }
 
-export function getUserJobsLocalStorage() {
+function getUserJobsLocalStorage() {
     if (!localStorage) {
         return [];
     }
@@ -333,7 +333,9 @@ function initWebSocketMessagingDataPage(){
     let ul = dropdown.parent().find(".dropdown-menu");
     
     messagingMode.Users.forEach((user)=>{
-        ul.append(`<a class='dropdown-item' href='#' onclick='Javascript:switchUserMessaging(${JSON.stringify(user)});'>${user.NAME}</a>`);
+        const link = $(`<a class='dropdown-item' href='#'>${user.NAME}</a>`);
+        link.on('click', () => switchUserMessaging(user));
+        ul.append(link);
     });
 
     messagingMode.ws = new WebSocket(messagingMode.url);
@@ -399,7 +401,7 @@ function updateUserMessagingContainer(){
     messageBody.scrollTop(5000);
 }
 
-export function switchUserMessaging(user) {
+function switchUserMessaging(user) {
     messagingMode.UserSelected = user;
 
     updateUserMessagingContainer();
@@ -461,3 +463,25 @@ function userMessageHtmlCode(from, date, message, us){
         </div>
     `;
 }
+
+export {
+    getBrowser,
+    initUserDetailsAndRoles,
+    logOutAjax,
+    resetLocalStorage,
+    SaveUserDetails,
+    getUserDetails,
+    userDetails,
+    saveClientsLocalStorage,
+    getClientsLocalStorage,
+    saveUsersLocalStorage,
+    getUsersLocalStorage,
+    saveUserJobsLocalStorage,
+    getUserJobsLocalStorage,
+    initWebSocketMessaging,
+    Client,
+    User,
+    JobInfo,
+    JobTyperequest,
+    MessageSocket
+};

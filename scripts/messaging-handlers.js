@@ -1,9 +1,15 @@
 "use strict";
-const mysql = require("mysql2");
-const options = require("./connection-options.json");
+import { createConnection } from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.loadWebSocketSettings = (request, response) => {
-    let connection = mysql.createConnection(options);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
+
+export const loadWebSocketSettings = (request, response) => {
+    let connection = createConnection(options);
     connection.connect();
 
     //console.log(request.body)
@@ -34,8 +40,8 @@ module.exports.loadWebSocketSettings = (request, response) => {
     });
 }
 
-module.exports.messagingInsertNew = (message, callback) => {
-    let connection = mysql.createConnection(options);
+export const messagingInsertNew = (message, callback) => {
+    let connection = createConnection(options);
     connection.connect();
 
     let query = `INSERT INTO MESSAGES (message_sent_by, message_from, message_to, message, date_created, seen) VALUES(?, ?, ?, ?, ?, ?)`;
@@ -52,9 +58,9 @@ module.exports.messagingInsertNew = (message, callback) => {
     });
 }
 
-module.exports.loadWebSocketMessages = (request, response) => {
+export const loadWebSocketMessages = (request, response) => {
     //console.log(request.body);
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     let query = `
         SELECT 

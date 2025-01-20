@@ -1,10 +1,16 @@
 "use strict";
-const mysql = require("mysql2");
-const options = require("./connection-options.json");
+import { createConnection } from "mysql2";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports.getListJobs = (request, response) => {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const optionsPath = join(__dirname, 'connection-options.json');
+const options = JSON.parse(readFileSync(optionsPath, 'utf-8'));
+
+export const getListJobs = (request, response) => {
     const {type, identifier} = request.body;
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     let query = `
         SELECT J.ID AS JOB_ID, J.USERID AS USER_ID_CREATED, USER_CREATION.NAME AS USER_NAME_CREATED, 
@@ -58,8 +64,8 @@ module.exports.getListJobs = (request, response) => {
     });
 }
 
-module.exports.getUserInfoInitState = (request, response) => {
-    let connection = mysql.createConnection(options);
+export const getUserInfoInitState = (request, response) => {
+    let connection = createConnection(options);
     connection.connect();
     let query1 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_STATUS' ORDER BY DISPLAY_ORDER ASC`;
     let query2 = `SELECT * FROM CODES WHERE DOMAIN = 'JOB_EQUIPEMENT' ORDER BY DISPLAY_ORDER ASC`;
@@ -78,10 +84,10 @@ module.exports.getUserInfoInitState = (request, response) => {
     });
 }
 
-module.exports.editJobInfo = (request, response) => {
+export const editJobInfo = (request, response) => {
     const {id, userId, status, equipmentType, equipmentTypeOther, equipmentProcedure, equipmentProcedureOther, equipmentBrand, notes, priority} = request.body;   
 
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     
     let query = `SELECT
@@ -141,10 +147,10 @@ module.exports.editJobInfo = (request, response) => {
     });
 }
 
-module.exports.createJob = (request, response) => {
+export const createJob = (request, response) => {
     const {userId, userIdClient, status, equipmentType, equipmentTypeOther, equipmentProcedure, equipmentProcedureOther, equipmentBrand, notes, priority} = request.body;
         
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
 
     let query = "SELECT MAX(Priority_Work) AS PRIORITY_NUMBER FROM JOB WHERE PRIORITY = ?";
@@ -183,9 +189,9 @@ module.exports.createJob = (request, response) => {
     });
 }
 
-module.exports.reopenJob = (request, response) => {
+export const reopenJob = (request, response) => {
     const {JobId} = request.body;
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
     let query = `UPDATE JOB SET STATUS = ?, DATEFINISHED = ?, USERIDFINALISED = ? WHERE ID = ?`;
 
@@ -199,10 +205,10 @@ module.exports.reopenJob = (request, response) => {
     });
 }
 
-module.exports.editOrderPriority = (request, response) => {
+export const editOrderPriority = (request, response) => {
     const { startRowInfo, endRowInfo } = request.body;
 
-    let connection = mysql.createConnection(options);
+    let connection = createConnection(options);
     connection.connect();
 
     let query1 = `UPDATE JOB SET Priority_Work = ? WHERE ID = ?`;
