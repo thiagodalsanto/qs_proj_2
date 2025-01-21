@@ -214,7 +214,6 @@ Após isso, foi corrigo os erros, tendo o seguinte retorno do ESLint:
 ![ESLint Erros](assets/eslint_corrigido.png)
 
 ## 4. Testes Automatizados com Mocha e Chai
-## 4. Testes Automatizados com Mocha e Chai
 
 ### 4.1. Introdução ao Mocha e Chai
 
